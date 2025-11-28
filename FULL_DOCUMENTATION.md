@@ -22,6 +22,7 @@ Enable the following:
 - Cloud Build API  
 - Cloud Storage API  
 - IAM API
+- Cloud Resource Manager API
 
 
 ### ✅ Create GKE Cluster and Artifact Registry

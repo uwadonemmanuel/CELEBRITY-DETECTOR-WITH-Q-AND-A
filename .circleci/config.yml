@@ -20,18 +20,24 @@ jobs:
     steps:
       - attach_workspace:
           at: ~/repo
-      - setup_remote_docker
+      - setup_remote_docker:
+          version: 20.10.14
+      - run:
+          name: Install Docker CLI
+          command: |
+            apt-get update && apt-get install -y docker.io
       - run:
           name: Authenticate with Google Cloud
           command: |
             echo "$GCLOUD_SERVICE_KEY" | base64 --decode > gcp-key.json
             gcloud auth activate-service-account --key-file=gcp-key.json
-            gcloud config set project llmops-anime-recommender
-            gcloud auth configure-docker us-central1-docker.pkg.dev
+            gcloud config set project $GOOGLE_PROJECT_ID
+            gcloud services enable cloudresourcemanager.googleapis.com
+            gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
       - run:
           name: Build and Push Image
           command: |
-            IMAGE_NAME="us-central1-docker.pkg.dev/llmops-anime-recommender/llmops-repo/llmops-app:latest"
+            IMAGE_NAME="us-central1-docker.pkg.dev/$GOOGLE_PROJECT_ID/llmops-repo/llmops-app:latest"
             docker build -t "$IMAGE_NAME" .
             docker push "$IMAGE_NAME"
 
@@ -41,18 +47,16 @@ jobs:
       - attach_workspace:
           at: ~/repo
       - run:
-          name: Install kubectl
+          name: Install kubectl and Docker CLI
           command: |
-            apt-get update && apt-get install -y kubectl
+            apt-get update && apt-get install -y kubectl docker.io
       - run:
           name: Authenticate with Google Cloud
           command: |
             echo "$GCLOUD_SERVICE_KEY" | base64 --decode > gcp-key.json
             gcloud auth activate-service-account --key-file=gcp-key.json
-            gcloud config set project llmops-anime-recommender
-      - run:
-          name: Configure GKE
-          command: |
+            gcloud config set project $GOOGLE_PROJECT_ID
+            gcloud services enable cloudresourcemanager.googleapis.com
             gcloud container clusters get-credentials "$GKE_CLUSTER" --region "$GOOGLE_COMPUTE_REGION"
       - run:
           name: Deploy to GKE
