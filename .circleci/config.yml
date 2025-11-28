@@ -26,12 +26,12 @@ jobs:
           command: |
             echo "$GCLOUD_SERVICE_KEY" | base64 --decode > gcp-key.json
             gcloud auth activate-service-account --key-file=gcp-key.json
-            gcloud config set project $GOOGLE_PROJECT_ID
+            gcloud config set project llmops-anime-recommender
             gcloud auth configure-docker us-central1-docker.pkg.dev
       - run:
           name: Build and Push Image
           command: |
-            IMAGE_NAME="us-central1-docker.pkg.dev/$GOOGLE_PROJECT_ID/llmops-repo/llmops-app:latest"
+            IMAGE_NAME="us-central1-docker.pkg.dev/llmops-anime-recommender/llmops-repo/llmops-app:latest"
             docker build -t "$IMAGE_NAME" .
             docker push "$IMAGE_NAME"
 
@@ -49,7 +49,7 @@ jobs:
           command: |
             echo "$GCLOUD_SERVICE_KEY" | base64 --decode > gcp-key.json
             gcloud auth activate-service-account --key-file=gcp-key.json
-            gcloud config set project $GOOGLE_PROJECT_ID
+            gcloud config set project llmops-anime-recommender
       - run:
           name: Configure GKE
           command: |
