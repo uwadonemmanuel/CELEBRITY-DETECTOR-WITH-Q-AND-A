@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Celebrity Recognition & Q&A</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body class="bg-gradient-to-br from-indigo-950 to-indigo-900 text-white p-6 font-sans min-h-screen">
+  <div class="max-w-5xl mx-auto space-y-8 animate-fadeIn">
+    <h1 class="text-4xl font-extrabold text-center text-rose-400 tracking-tight">🌟 Celebrity Detector + Q&A</h1>
+
+    <form method="POST" enctype="multipart/form-data" class="flex flex-col items-center gap-4">
+      <input type="file" name="image" accept="image/*" required class="p-2 bg-indigo-900 border border-indigo-700 rounded-lg w-full max-w-md text-sm">
+      <button type="submit" class="bg-rose-500 hover:bg-rose-600 px-6 py-2 rounded-lg text-black font-semibold shadow-md transition">
+        Detect Celebrity
+      </button>
+    </form>
+
+    {% if result_img_data %}
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 items-start">
+        <div class="rounded-xl overflow-hidden shadow-lg bg-indigo-900 p-2">
+          <img src="data:image/jpeg;base64,{{ result_img_data }}" alt="Detected Celebrity" class="rounded-lg w-full">
+        </div>
+
+        <div class="bg-indigo-900 p-6 rounded-xl shadow-md">
+          <h2 class="text-2xl font-semibold text-rose-300 mb-4">📄 Detected Info</h2>
+
+          <div class="bg-indigo-950 p-4 rounded-lg border border-indigo-700 space-y-2 text-sm">
+            {% for line in player_info.splitlines() %}
+              {% if "**Full Name**" in line %}
+                <p><strong class="text-rose-400">👤 Full Name:</strong> {{ line.split(':', 1)[-1].strip() }}</p>
+              {% elif "**Profession**" in line %}
+                <p><strong class="text-rose-400">🎭 Profession:</strong> {{ line.split(':', 1)[-1].strip() }}</p>
+              {% elif "**Nationality**" in line %}
+                <p><strong class="text-rose-400">🌍 Nationality:</strong> {{ line.split(':', 1)[-1].strip() }}</p>
+              {% elif "**Famous For**" in line %}
+                <p><strong class="text-rose-400">⭐ Famous For:</strong> {{ line.split(':', 1)[-1].strip() }}</p>
+              {% elif "**Top Achievements**" in line %}
+                <p><strong class="text-rose-400">🏆 Top Achievements:</strong></p>
+                <ul class="list-disc list-inside text-rose-200 ml-2">
+              {% elif line.startswith("  - ") %}
+                <li>{{ line.replace('  - ', '') }}</li>
+              {% endif %}
+            {% endfor %}
+            {% if player_info.find("**Top Achievements**") != -1 %}
+              </ul>
+            {% endif %}
+          </div>
+
+          {% if has_valid_celebrity %}
+          <form method="POST" class="mt-6 space-y-3">
+            <input type="hidden" name="player_name" value="{{ player_name }}">
+            <input type="hidden" name="player_info" value="{{ player_info }}">
+            <input type="hidden" name="result_img_data" value="{{ result_img_data }}">
+
+            <input name="question" placeholder="Ask something about this celebrity..." required class="p-3 w-full bg-indigo-800 border border-indigo-700 rounded-lg text-white text-sm">
+            <button type="submit" class="bg-rose-600 hover:bg-rose-700 px-6 py-2 rounded-lg font-medium transition">
+              💬 Ask
+            </button>
+          </form>
+          {% else %}
+          <div class="mt-6 p-4 bg-red-900/50 border border-red-700 rounded-lg text-red-200 text-sm">
+            <strong>⚠️ Error:</strong> {{ player_info }}
+            <p class="mt-2">Please try uploading a different image or check your API configuration.</p>
+          </div>
+          {% endif %}
+
+          {% if answer %}
+            <div class="answer-box mt-6 text-rose-200 text-sm">
+              <strong class="text-white">Answer:</strong><br>{{ answer }}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+</body>
+</html>

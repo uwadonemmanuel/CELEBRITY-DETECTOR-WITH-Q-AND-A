@@ -1,0 +1,40 @@
+/* Base Styles */
+body {
+  font-family: 'Inter', sans-serif;
+  transition: all 0.3s ease;
+}
+
+/* Buttons */
+button {
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(255, 186, 148, 0.3); /* Rose gold shadow */
+}
+
+/* Image hover effect */
+img {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+img:hover {
+  transform: scale(1.02);
+  box-shadow: 0 10px 25px rgba(255, 186, 148, 0.25);
+}
+
+/* Answer box */
+.answer-box {
+  animation: fadeIn 0.5s ease-in-out;
+  background: linear-gradient(to right, #1e1b4b, #2e1065); /* Indigo shades */
+  padding: 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #a78bfa;
+}
+
+/* Subtle fade in */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
